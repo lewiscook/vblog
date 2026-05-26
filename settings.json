@@ -1,0 +1,13 @@
+{
+	"bearer": "Bearer",
+	"UserName": "apitress-liberty-carton",
+	"Password": "kJT9sQxa@&N^8au9kfHZb4c",
+	"workingDir": "/temp2/",
+	"fromDate": "20231101",
+	"toDate": "20231117",
+	"petition": 1,
+	"server": "10.140.44.73",
+	"database1": "LIBERTY_TRESS",
+	"database2": "LIBERTY_SAN_LUIS",
+	"database3": "LIBERTY_NOGALES"
+}
