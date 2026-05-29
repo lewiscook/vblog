@@ -41,7 +41,7 @@ export default function CategoryPage() {
             {category.name}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {pagination.total} videos in this category
+            {pagination.total} {['chapters', 'capitulos'].includes(category.slug) ? 'readings in this category' : 'videos in this category'}
           </Typography>
         </Box>
       )}

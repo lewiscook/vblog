@@ -1,9 +1,12 @@
-import React from 'react'
-import { Card, CardContent, Avatar, Typography, Box, Chip } from '@mui/material'
-import { PlayArrow, Visibility } from '@mui/icons-material'
+import React, { useState } from 'react'
+import { Card, CardContent, Avatar, Typography, Box, IconButton, Tooltip } from '@mui/material'
+import { PlayArrow, Visibility, Favorite, FavoriteBorder, Share, ChatBubbleOutline } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { likeVideo } from '../../store/slices/videosSlice'
+import CommentsModal from '../common/CommentsModal'
 
-function formatViews(n) {
+function formatCount(n) {
   if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M'
   if (n >= 1e3) return (n / 1e3).toFixed(0) + 'K'
   return n
@@ -21,10 +24,45 @@ function timeAgo(dateStr) {
 
 export default function VideoCard({ video }) {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const likedIds = useSelector(s => s.videos.likedIds)
+
+  const isStory = video.type === 'story'
+  const liked = likedIds.includes(video.id)
+  const [copiedTip, setCopiedTip] = useState(false)
+  const [commentsOpen, setCommentsOpen] = useState(false)
+
+  const handleLike = (e) => {
+    e.stopPropagation()
+    dispatch(likeVideo(video.id))
+  }
+
+  const handleShare = async (e) => {
+    e.stopPropagation()
+    const path = isStory ? `/story/${video.id}` : `/video/${video.id}`
+    const url = `${window.location.origin}${path}`
+    const shareData = { title: video.title, text: video.description || '', url }
+
+    if (navigator.share && navigator.canShare?.(shareData) !== false) {
+      try {
+        await navigator.share(shareData)
+      } catch (err) {
+        if (err.name === 'AbortError') return   // user dismissed — do nothing
+        // real failure: fall back to clipboard
+        await navigator.clipboard.writeText(url)
+        setCopiedTip(true)
+        setTimeout(() => setCopiedTip(false), 2000)
+      }
+    } else {
+      await navigator.clipboard.writeText(url)
+      setCopiedTip(true)
+      setTimeout(() => setCopiedTip(false), 2000)
+    }
+  }
 
   return (
     <Card
-      onClick={() => navigate(`/video/${video.id}`)}
+      onClick={() => navigate(isStory ? `/story/${video.id}` : `/video/${video.id}`)}
       sx={{ cursor: 'pointer', bgcolor: 'background.paper', overflow: 'hidden' }}
     >
       {/* Thumbnail */}
@@ -37,7 +75,9 @@ export default function VideoCard({ video }) {
         />
         <Box className="play-overlay">
           <Box className="play-btn-circle">
-            <PlayArrow sx={{ color: '#fff', fontSize: 24, ml: 0.5 }} />
+            {isStory
+              ? <span style={{ color: '#fff', fontSize: 13, fontWeight: 700, letterSpacing: 1 }}>READ</span>
+              : <PlayArrow sx={{ color: '#fff', fontSize: 24, ml: 0.5 }} />}
           </Box>
         </Box>
         {/* Duration badge */}
@@ -56,7 +96,7 @@ export default function VideoCard({ video }) {
           <Avatar
             src={video.author.avatar}
             sx={{ width: 34, height: 34, flexShrink: 0, cursor: 'pointer' }}
-            onClick={e => { e.stopPropagation() }}
+            onClick={e => e.stopPropagation()}
           />
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Typography
@@ -70,15 +110,63 @@ export default function VideoCard({ video }) {
             <Typography variant="caption" color="text.secondary" display="block">
               {video.author.name}
             </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.3 }}>
-              <Visibility sx={{ fontSize: 12, color: 'text.disabled' }} />
-              <Typography variant="caption" color="text.disabled">
-                {formatViews(video.views)} · {timeAgo(video.publishedAt)}
-              </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 0.3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Visibility sx={{ fontSize: 12, color: 'text.disabled' }} />
+                <Typography variant="caption" color="text.disabled">
+                  {formatCount(video.views)} · {timeAgo(video.publishedAt)}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}>
+                <IconButton
+                  size="small"
+                  onClick={handleLike}
+                  sx={{ p: 0.4, color: liked ? 'error.main' : 'text.disabled', '&:hover': { color: 'error.main' } }}
+                >
+                  {liked
+                    ? <Favorite sx={{ fontSize: 15 }} />
+                    : <FavoriteBorder sx={{ fontSize: 15 }} />}
+                </IconButton>
+                {video.likes > 0 && (
+                  <Typography variant="caption" color={liked ? 'error.main' : 'text.disabled'} sx={{ fontSize: 11 }}>
+                    {formatCount(video.likes)}
+                  </Typography>
+                )}
+                <Tooltip
+                  title={copiedTip ? 'Link copied!' : 'Share'}
+                  placement="top"
+                  open={copiedTip || undefined}
+                  arrow
+                >
+                  <IconButton
+                    size="small"
+                    onClick={handleShare}
+                    sx={{ p: 0.4, color: 'text.disabled', '&:hover': { color: 'primary.main' } }}
+                  >
+                    <Share sx={{ fontSize: 15 }} />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Comments" placement="top" arrow>
+                  <IconButton
+                    size="small"
+                    onClick={e => { e.stopPropagation(); setCommentsOpen(true) }}
+                    sx={{ p: 0.4, color: 'text.disabled', '&:hover': { color: 'primary.main' } }}
+                  >
+                    <ChatBubbleOutline sx={{ fontSize: 15 }} />
+                  </IconButton>
+                </Tooltip>
+              </Box>
             </Box>
           </Box>
         </Box>
       </CardContent>
+
+      <CommentsModal
+        open={commentsOpen}
+        onClose={() => setCommentsOpen(false)}
+        videoId={video.id}
+        title={video.title}
+      />
     </Card>
   )
 }

@@ -5,6 +5,7 @@ export const fetchVideos = createAsyncThunk('videos/fetchAll', (params) => video
 export const fetchFeatured = createAsyncThunk('videos/fetchFeatured', () => videosApi.getFeatured())
 export const fetchVideoById = createAsyncThunk('videos/fetchById', (id) => videosApi.getById(id))
 export const fetchRelated = createAsyncThunk('videos/fetchRelated', (id) => videosApi.getRelated(id))
+export const viewVideo = createAsyncThunk('videos/view', (id) => videosApi.view(id).then(data => ({ id, views: data.views })))
 export const likeVideo = createAsyncThunk('videos/like', (id) => videosApi.like(id).then(data => ({ id, likes: data.likes })))
 export const searchVideos = createAsyncThunk('videos/search', (params) => searchApi.search(params))
 
@@ -46,6 +47,13 @@ const videosSlice = createSlice({
       .addCase(fetchVideoById.rejected, (state, action) => { state.currentLoading = false; state.error = action.error.message })
 
       .addCase(fetchRelated.fulfilled, (state, action) => { state.related = action.payload })
+
+      .addCase(viewVideo.fulfilled, (state, action) => {
+        const { id, views } = action.payload
+        if (state.current?.id === id) state.current.views = views
+        const item = state.items.find(v => v.id === id)
+        if (item) item.views = views
+      })
 
       .addCase(likeVideo.fulfilled, (state, action) => {
         const { id, likes } = action.payload

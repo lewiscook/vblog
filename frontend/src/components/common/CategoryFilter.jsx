@@ -3,6 +3,8 @@ import { Box, Chip, Skeleton } from '@mui/material'
 import { useSelector, useDispatch } from 'react-redux'
 import { setSelected } from '../../store/slices/categoriesSlice'
 
+const VISIBLE_SLUGS = ['novel', 'chapters', 'capitulos']
+
 export default function CategoryFilter({ onChange }) {
   const dispatch = useDispatch()
   const { items, selected, loading } = useSelector(s => s.categories)
@@ -15,7 +17,7 @@ export default function CategoryFilter({ onChange }) {
   if (loading) {
     return (
       <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-        {Array.from({ length: 9 }).map((_, i) => <Skeleton key={i} variant="rounded" width={80} height={32} />)}
+        {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} variant="rounded" width={80} height={32} />)}
       </Box>
     )
   }
@@ -36,7 +38,7 @@ export default function CategoryFilter({ onChange }) {
         onClick={() => handleSelect('all')}
         sx={{ fontWeight: 600, flexShrink: 0 }}
       />
-      {items.map(cat => (
+      {items.filter(cat => VISIBLE_SLUGS.includes(cat.slug)).map(cat => (
         <Chip
           key={cat.id}
           label={cat.name}
@@ -51,7 +53,7 @@ export default function CategoryFilter({ onChange }) {
               color: '#fff',
               borderColor: cat.color,
             }),
-            ...( selected !== cat.slug && {
+            ...(selected !== cat.slug && {
               borderColor: cat.color + '66',
               color: cat.color,
             }),

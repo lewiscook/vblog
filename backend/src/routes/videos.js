@@ -4,15 +4,20 @@ import { videos } from '../data/mockData.js'
 const router = Router()
 
 router.get('/', (req, res) => {
+  const VISIBLE_CATEGORIES = ['novel', 'chapters', 'capitulos']
+
   const { category, page = 1, limit = 12, sort = 'newest' } = req.query
   let result = [...videos]
 
   if (category && category !== 'all') {
     result = result.filter(v => v.category === category)
+  } else {
+    result = result.filter(v => VISIBLE_CATEGORIES.includes(v.category))
   }
 
   if (sort === 'popular') result.sort((a, b) => b.views - a.views)
   else if (sort === 'liked') result.sort((a, b) => b.likes - a.likes)
+  else if (sort === 'oldest') result.sort((a, b) => new Date(a.publishedAt) - new Date(b.publishedAt))
   else result.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
 
   const total = result.length
@@ -42,6 +47,13 @@ router.get('/:id/related', (req, res) => {
     .filter(v => v.id !== video.id && (v.category === video.category || v.tags.some(t => video.tags.includes(t))))
     .slice(0, 8)
   res.json(related)
+})
+
+router.post('/:id/view', (req, res) => {
+  const video = videos.find(v => v.id === req.params.id)
+  if (!video) return res.status(404).json({ error: 'Video not found' })
+  video.views += 1
+  res.json({ views: video.views })
 })
 
 router.post('/:id/like', (req, res) => {

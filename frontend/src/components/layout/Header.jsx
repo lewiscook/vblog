@@ -2,15 +2,16 @@ import React, { useState, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import {
-  AppBar, Toolbar, IconButton, InputBase, Avatar, Tooltip,
-  Box, useMediaQuery, useTheme, Badge,
+  AppBar, Toolbar, IconButton, InputBase, Tooltip,
+  Box, useMediaQuery, useTheme, Button,
 } from '@mui/material'
 import {
   Menu as MenuIcon, Search, Close, DarkMode, LightMode,
-  VideoLibrary, Notifications,
+  VideoLibrary,
 } from '@mui/icons-material'
 import { toggleDarkMode, toggleSidebar } from '../../store/slices/uiSlice'
 import { searchVideos, setSearchQuery } from '../../store/slices/videosSlice'
+import SubscribeModal from '../common/SubscribeModal'
 
 export default function Header() {
   const dispatch = useDispatch()
@@ -20,6 +21,7 @@ export default function Header() {
   const darkMode = useSelector(s => s.ui.darkMode)
   const [searchOpen, setSearchOpen] = useState(false)
   const [inputVal, setInputVal] = useState('')
+  const [subscribeOpen, setSubscribeOpen] = useState(false)
 
   const handleSearch = useCallback((e) => {
     e.preventDefault()
@@ -51,7 +53,7 @@ export default function Header() {
               <VideoLibrary sx={{ fontSize: 18, color: '#fff' }} />
             </Box>
             {!isMobile && (
-              <span className="gradient-text text-xl font-bold tracking-tight">VBlog</span>
+              <span className="gradient-text text-xl font-bold tracking-tight">VStoryBlog</span>
             )}
           </Box>
         )}
@@ -76,7 +78,7 @@ export default function Header() {
             <InputBase
               value={inputVal}
               onChange={e => setInputVal(e.target.value)}
-              placeholder="Search videos..."
+              placeholder="Search..."
               sx={{ flex: 1, fontSize: 14 }}
             />
           </Box>
@@ -110,16 +112,22 @@ export default function Header() {
           </IconButton>
         </Tooltip>
 
-        <IconButton size="small">
-          <Badge badgeContent={3} color="secondary">
-            <Notifications />
-          </Badge>
-        </IconButton>
+        <Button
+          variant="contained"
+          size="small"
+          onClick={() => setSubscribeOpen(true)}
+          sx={{
+            borderRadius: 50, px: 2, fontWeight: 700, fontSize: 13,
+            background: 'linear-gradient(135deg, #6C63FF, #FF6584)',
+            '&:hover': { background: 'linear-gradient(135deg, #5a52e0, #e0506f)' },
+            flexShrink: 0,
+          }}
+        >
+          {isMobile ? 'Join' : 'Subscribe'}
+        </Button>
 
-        <Avatar
-          src="https://picsum.photos/seed/user/40/40"
-          sx={{ width: 34, height: 34, cursor: 'pointer', border: '2px solid', borderColor: 'primary.main' }}
-        />
+        <SubscribeModal open={subscribeOpen} onClose={() => setSubscribeOpen(false)} />
+
       </Toolbar>
     </AppBar>
   )

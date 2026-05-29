@@ -9,7 +9,7 @@ import {
   Home, Whatshot, VideoLibrary, Subscriptions,
   Computer, Flight, SportsEsports, Restaurant,
   FitnessCenter, MusicNote, Palette, School,
-  ExpandMore, ChatBubbleOutline,
+  ExpandMore,
 } from '@mui/icons-material'
 import { setSidebarOpen } from '../../store/slices/uiSlice'
 
@@ -21,7 +21,9 @@ const CATEGORY_ICONS = {
 
 const NAV_ITEMS = [
   { label: 'Home', icon: Home, path: '/' },
-  { label: 'Comments', icon: ChatBubbleOutline, path: '/comments' },
+  { label: 'Trending', icon: Whatshot, path: '/?sort=popular' },
+  { label: 'Library', icon: VideoLibrary, path: '/library' },
+  { label: 'Subscriptions', icon: Subscriptions, path: '/subscriptions' },
 ]
 
 const DRAWER_WIDTH = 240
@@ -71,7 +73,7 @@ export default function Sidebar() {
       </Box>
 
       <List sx={{ px: 1, flex: 1, overflowY: 'auto' }}>
-        {categories.filter(cat => ['novel', 'chapters', 'capitulos'].includes(cat.slug)).map((cat) => {
+        {categories.map((cat) => {
           const Icon = CATEGORY_ICONS[cat.slug] || School
           const isActive = location.pathname === `/category/${cat.slug}`
           return (
@@ -107,7 +109,7 @@ export default function Sidebar() {
       <Divider />
       <Box sx={{ p: 2 }}>
         <Typography variant="caption" color="text.secondary">
-          © 2026 VStoryBlog · All rights reserved
+          © 2024 VBlog · All rights reserved
         </Typography>
       </Box>
     </Box>

@@ -15,14 +15,14 @@ export default function Footer() {
           }}>
             <VideoLibrary sx={{ fontSize: 14, color: '#fff' }} />
           </Box>
-          <Typography variant="body2" fontWeight={700} className="gradient-text">VStoryBlog</Typography>
+          <Typography variant="body2" fontWeight={700} className="gradient-text">VBlog</Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 3 }}>
-          {['About'].map(l => (
+          {['About', 'Privacy', 'Terms', 'Help'].map(l => (
             <Link key={l} href="#" underline="hover" color="text.secondary" variant="caption">{l}</Link>
           ))}
         </Box>
-        <Typography variant="caption" color="text.secondary">L. Cook © 2026 VStoryBlog · All rights reserved.</Typography>
+        <Typography variant="caption" color="text.secondary">© 2024 VBlog. All rights reserved.</Typography>
       </Box>
     </Box>
   )

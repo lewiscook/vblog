@@ -8,6 +8,10 @@ import Home from './pages/Home'
 import VideoDetail from './pages/VideoDetail'
 import CategoryPage from './pages/CategoryPage'
 import SearchResults from './pages/SearchResults'
+import StoryDetail from './pages/StoryDetail'
+import VerifyPage from './pages/VerifyPage'
+import CommentsPage from './pages/CommentsPage'
+import AdminPage from './pages/AdminPage'
 import NotFound from './pages/NotFound'
 
 export default function App() {
@@ -24,6 +28,10 @@ export default function App() {
             <Route path="/video/:id" element={<VideoDetail />} />
             <Route path="/category/:slug" element={<CategoryPage />} />
             <Route path="/search" element={<SearchResults />} />
+            <Route path="/story/:id" element={<StoryDetail />} />
+            <Route path="/comments" element={<CommentsPage />} />
+            <Route path="/verify" element={<VerifyPage />} />
+            <Route path="/admin" element={<AdminPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>

@@ -9,7 +9,7 @@ import {
   ThumbUp, ThumbUpOutlined, Share, Bookmark,
   BookmarkBorder, MoreHoriz, ArrowBack, Visibility,
 } from '@mui/icons-material'
-import { fetchVideoById, fetchRelated, likeVideo, clearCurrent } from '../store/slices/videosSlice'
+import { fetchVideoById, fetchRelated, likeVideo, viewVideo, clearCurrent } from '../store/slices/videosSlice'
 import VideoPlayer from '../components/video/VideoPlayer'
 import RelatedVideos from '../components/video/RelatedVideos'
 
@@ -37,6 +37,7 @@ export default function VideoDetail() {
   useEffect(() => {
     dispatch(fetchVideoById(id))
     dispatch(fetchRelated(id))
+    dispatch(viewVideo(id))
     window.scrollTo(0, 0)
     return () => dispatch(clearCurrent())
   }, [id, dispatch])

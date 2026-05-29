@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Box, Typography, Button, Divider, Select, MenuItem, FormControl } from '@mui/material'
 import { useDispatch, useSelector } from 'react-redux'
 import { useSearchParams } from 'react-router-dom'
-import { fetchVideos, fetchFeatured } from '../store/slices/videosSlice'
+import { fetchVideos } from '../store/slices/videosSlice'
 import { setSelected } from '../store/slices/categoriesSlice'
 import HeroSection from '../components/video/HeroSection'
 import VideoGrid from '../components/video/VideoGrid'
@@ -13,12 +13,8 @@ export default function Home() {
   const [searchParams] = useSearchParams()
   const [sort, setSort] = useState(searchParams.get('sort') || 'newest')
 
-  const { items, featured, loading, pagination } = useSelector(s => s.videos)
+  const { items, loading, pagination } = useSelector(s => s.videos)
   const selectedCategory = useSelector(s => s.categories.selected)
-
-  useEffect(() => {
-    dispatch(fetchFeatured())
-  }, [dispatch])
 
   useEffect(() => {
     dispatch(fetchVideos({
@@ -46,7 +42,7 @@ export default function Home() {
     <Box sx={{ p: { xs: 2, md: 3 } }}>
       {/* Hero */}
       <Box sx={{ mb: 3 }}>
-        <HeroSection videos={featured} loading={!featured.length && loading} />
+        <HeroSection />
       </Box>
 
       {/* Toolbar */}
@@ -60,6 +56,7 @@ export default function Home() {
         <FormControl size="small" sx={{ minWidth: 130 }}>
           <Select value={sort} onChange={e => setSort(e.target.value)} sx={{ borderRadius: 2, fontSize: 13 }}>
             <MenuItem value="newest">Newest</MenuItem>
+            <MenuItem value="oldest">Oldest</MenuItem>
             <MenuItem value="popular">Most Viewed</MenuItem>
             <MenuItem value="liked">Most Liked</MenuItem>
           </Select>
